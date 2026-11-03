@@ -186,8 +186,6 @@ private fun LauncherApp() {
 
             when (destination) {
                 Destination.Play -> PlayScreen(
-                    selectedServer = selectedServer,
-                    onOpenServers = { destination = Destination.Servers },
                     onPlay = { showClientInfo = true },
                     onSupport = {
                         openSupport(context)
