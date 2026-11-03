@@ -8,6 +8,9 @@ import android.view.SoundEffectConstants
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -104,7 +107,13 @@ private fun LauncherApp() {
     var destination by remember { mutableStateOf(Destination.Play) }
     var settingsCategory by remember { mutableStateOf(SettingsCategory.Appearance) }
     var selectedServer by remember {
-        mutableStateOf(preferences.getString("selected_server", "Москва") ?: "Москва")
+        mutableStateOf(
+            if (preferences.getBoolean("remember_server", true)) {
+                preferences.getString("selected_server", "Москва") ?: "Москва"
+            } else {
+                "Москва"
+            }
+        )
     }
     var rememberServer by remember {
         mutableStateOf(preferences.getBoolean("remember_server", true))
@@ -205,7 +214,11 @@ private fun LauncherApp() {
                     onRememberServerChanged = {
                         rememberServer = it
                         preferences.edit().putBoolean("remember_server", it).apply()
-                        if (it) preferences.edit().putString("selected_server", selectedServer).apply()
+                        if (it) {
+                            preferences.edit().putString("selected_server", selectedServer).apply()
+                        } else {
+                            preferences.edit().remove("selected_server").apply()
+                        }
                     },
                     showWallpaper = showWallpaper,
                     onShowWallpaperChanged = {
@@ -242,7 +255,8 @@ private fun LauncherApp() {
                 onSelected = { destination = it },
                 clickSounds = clickSounds,
                 haptics = haptics,
-                animations = animations
+                animations = animations,
+                modifier = Modifier.align(Alignment.CenterStart).padding(start = 22.dp)
             )
         }
 
@@ -284,16 +298,14 @@ private fun GlassNavigation(
     onSelected: (Destination) -> Unit,
     clickSounds: Boolean,
     haptics: Boolean,
-    animations: Boolean
+    animations: Boolean,
+    modifier: Modifier = Modifier
 ) {
     val view = LocalView.current
     val haptic = LocalHapticFeedback.current
-    val railModifier = Modifier
-        .align(Alignment.CenterStart)
-        .padding(start = 22.dp)
 
     Column(
-        modifier = railModifier,
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(13.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -346,9 +358,20 @@ private fun GlassNavigationButton(
     onClick: () -> Unit
 ) {
     val shape = RoundedCornerShape(18.dp)
+    val selectedProgress by animateFloatAsState(
+        targetValue = if (selected) 1f else 0f,
+        animationSpec = if (animations) tween(durationMillis = 170) else snap(),
+        label = "navigation-selection"
+    )
+    val scale by animateFloatAsState(
+        targetValue = if (selected && animations) 1.035f else 1f,
+        animationSpec = if (animations) tween(durationMillis = 170) else snap(),
+        label = "navigation-scale"
+    )
     Box(
         Modifier
             .size(58.dp)
+            .then(Modifier.scale(scale))
             .shadow(
                 elevation = if (selected) 11.dp else 7.dp,
                 shape = shape,
@@ -367,7 +390,7 @@ private fun GlassNavigationButton(
             )
             .border(
                 width = 1.dp,
-                color = if (selected) Accent.copy(alpha = 0.78f) else GlassBorder,
+                color = if (selected) Accent.copy(alpha = 0.30f + 0.48f * selectedProgress) else GlassBorder,
                 shape = shape
             )
             .clickable(onClick = onClick),
@@ -1001,10 +1024,8 @@ private fun SettingsToggleRow(
         Switch(
             checked = checked,
             onCheckedChange = {
-                if (checked.not()) {
-                    view.playSoundEffect(SoundEffectConstants.CLICK)
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                }
+                view.playSoundEffect(SoundEffectConstants.CLICK)
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onCheckedChange(it)
             },
             colors = SwitchDefaults.colors(
