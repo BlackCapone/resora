@@ -1,16 +1,16 @@
-# CRMP Launcher
+# CRMP Mobile Launcher
 
 Native Android launcher foundation for a San Andreas Multiplayer-based CRMP client.
 
-## Current interface
+## Interface direction
 
-- Landscape-only launcher layout.
-- Fixed left navigation: Play, Servers, Settings.
-- Dark, Majestic-inspired visual direction with a compact sidebar, clear active state, restrained red accent, and a wide content area.
-- Play screen with selected-server summary and quick server switching.
-- Servers screen for Moscow and Krasnodar.
-- Settings screen with local interface toggles and an honest client-component readiness list.
-- Launch action explains missing runtime requirements instead of pretending the game is installed.
+- Landscape-first, full-screen launcher.
+- Three icon-only glass navigation controls on the left: Play, Servers, Settings.
+- Full-screen custom night-city artwork and a transparent PNG wordmark.
+- Play action fixed to the lower-right corner; support action in the upper-right.
+- Server list with a clear selected state. Online counts are intentionally not fabricated; they require the server API.
+- Settings grouped around the categories familiar from BLACK RUSSIA: appearance, personal, sound, graphics, controls, and security.
+- Local settings (background visibility/dimming, server memory, click sounds, haptics, and interface animations) are persisted on-device.
 
 ## Project stack
 
@@ -20,7 +20,7 @@ Native Android launcher foundation for a San Andreas Multiplayer-based CRMP clie
 
 ## Not included yet
 
-This is the launcher UI foundation, not a playable game client. SA-MP/CRMP client binaries, CEF runtime, server connection protocol, account API, patcher, and download manifests still need to be integrated. Those components must come from files and interfaces that you are authorized to distribute.
+This is the launcher UI foundation, not a playable game client. SA-MP/CRMP client binaries, CEF runtime, server connection protocol, account API, patcher, and download manifests still need to be integrated. Game graphics and control settings will only become functional once the game runtime is connected.
 
 ## Build
 
