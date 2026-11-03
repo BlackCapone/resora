@@ -123,7 +123,7 @@ private fun LauncherApp() {
         mutableStateOf(preferences.getBoolean("show_wallpaper", true))
     }
     var backgroundDim by remember {
-        mutableFloatStateOf(preferences.getFloat("background_dim", 0.48f))
+        mutableFloatStateOf(preferences.getFloat("background_dim", 0.24f))
     }
     var clickSounds by remember {
         mutableStateOf(preferences.getBoolean("click_sounds", true))
@@ -180,7 +180,7 @@ private fun LauncherApp() {
             )
             Box(
                 Modifier.fillMaxSize().background(
-                    Color(0xFF070B10).copy(alpha = backgroundDim.coerceIn(0.15f, 0.82f))
+                    Color(0xFF070B10).copy(alpha = backgroundDim.coerceIn(0.10f, 0.72f))
                 )
             )
 
@@ -865,7 +865,9 @@ private fun SettingsContentPanel(
                         "Показывать заставку",
                         "Использовать городское изображение на фоне",
                         showWallpaper,
-                        onShowWallpaperChanged
+                        onShowWallpaperChanged,
+                        clickSounds,
+                        haptics
                     )
                     Box(Modifier.fillMaxWidth().height(1.dp).background(DividerColor))
                     Column(Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
@@ -884,7 +886,7 @@ private fun SettingsContentPanel(
                         Slider(
                             value = backgroundDim,
                             onValueChange = onBackgroundDimChanged,
-                            valueRange = 0.15f..0.82f,
+                            valueRange = 0.10f..0.72f,
                             colors = SliderDefaults.colors(
                                 thumbColor = Accent,
                                 activeTrackColor = Accent,
@@ -899,7 +901,9 @@ private fun SettingsContentPanel(
                         "Запоминать сервер",
                         "Открывать лаунчер с последним выбранным миром",
                         rememberServer,
-                        onRememberServerChanged
+                        onRememberServerChanged,
+                        clickSounds,
+                        haptics
                     )
                     Box(Modifier.fillMaxWidth().height(1.dp).background(DividerColor))
                     SettingsInfoRow(
@@ -923,14 +927,18 @@ private fun SettingsContentPanel(
                         "Звуки нажатий",
                         "Системный звук при взаимодействии с элементами",
                         clickSounds,
-                        onClickSoundsChanged
+                        onClickSoundsChanged,
+                        clickSounds,
+                        haptics
                     )
                     Box(Modifier.fillMaxWidth().height(1.dp).background(DividerColor))
                     SettingsToggleRow(
                         "Тактильный отклик",
                         "Лёгкая вибрация при нажатии",
                         haptics,
-                        onHapticsChanged
+                        onHapticsChanged,
+                        clickSounds,
+                        haptics
                     )
                 }
 
@@ -939,7 +947,9 @@ private fun SettingsContentPanel(
                         "Анимации интерфейса",
                         "Плавное переключение экранов и состояний",
                         animations,
-                        onAnimationsChanged
+                        onAnimationsChanged,
+                        clickSounds,
+                        haptics
                     )
                     Box(Modifier.fillMaxWidth().height(1.dp).background(DividerColor))
                     SettingsInfoRow(
@@ -1009,7 +1019,9 @@ private fun SettingsToggleRow(
     title: String,
     subtitle: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    clickSounds: Boolean,
+    haptics: Boolean
 ) {
     val view = LocalView.current
     val haptic = LocalHapticFeedback.current
@@ -1025,8 +1037,8 @@ private fun SettingsToggleRow(
         Switch(
             checked = checked,
             onCheckedChange = {
-                view.playSoundEffect(SoundEffectConstants.CLICK)
-                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                if (clickSounds) view.playSoundEffect(SoundEffectConstants.CLICK)
+                if (haptics) haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onCheckedChange(it)
             },
             colors = SwitchDefaults.colors(
