@@ -426,8 +426,6 @@ private fun GlassNavigationButton(
 
 @Composable
 private fun PlayScreen(
-    selectedServer: String,
-    onOpenServers: () -> Unit,
     onPlay: () -> Unit,
     onSupport: () -> Unit,
     clickSounds: Boolean,
@@ -446,17 +444,6 @@ private fun PlayScreen(
             onClick = {
                 playInteraction(view, haptic, clickSounds, haptics)
                 onSupport()
-            }
-        )
-
-        ServerSelectionPill(
-            server = selectedServer,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 30.dp, bottom = 101.dp),
-            onClick = {
-                playInteraction(view, haptic, clickSounds, haptics)
-                onOpenServers()
             }
         )
 
