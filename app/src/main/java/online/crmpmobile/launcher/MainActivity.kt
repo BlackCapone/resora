@@ -125,7 +125,7 @@ private fun Sidebar(section: LauncherSection, onSectionSelected: (LauncherSectio
         ) {
             Box(
                 Modifier.size(39.dp).clip(RoundedCornerShape(11.dp))
-                    .background(Brush.linearGradient(listOf(Accent, Color(0xFF9E143B))),
+                    .background(Brush.linearGradient(listOf(Accent, Color(0xFF9E143B)))),
                 contentAlignment = Alignment.Center
             ) {
                 Text("C", color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Black)
